@@ -17,6 +17,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            mkdir thisishogrider
             cd ~/myportfolio
             cd ~/sameer-portfolio
 
