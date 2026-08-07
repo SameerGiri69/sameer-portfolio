@@ -6,7 +6,30 @@ on:
       - main
 
 jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/awsportfolio:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/awsportfolio:${{ github.sha }}
+
   deploy:
+    needs: build-and-push
     runs-on: ubuntu-latest
 
     steps:
@@ -17,22 +40,19 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/myportfolio
-            cd sameer-portfolio
+            echo "Logging into Docker Hub..."
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | sudo docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-            echo "Pulling latest code..."
-            git pull origin main
+            echo "Pulling latest image..."
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/awsportfolio:latest
 
             echo "Stopping old container..."
             sudo docker rm -f portfolio || true
-
-            echo "Building new image..."
-            sudo docker build -t portfolio .
 
             echo "Starting new container..."
             sudo docker run -d \
               --name portfolio \
               -p 80:80 \
-              portfolio
+              ${{ secrets.DOCKERHUB_USERNAME }}/awsportfolio:latest
 
             echo "Deployment complete!"

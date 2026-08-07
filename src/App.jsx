@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 
 const portfolioData = {
-  "name": "Hogrider",
+  "name": "sameer",
   "title": "Backend Developer",
   "location": "Jhapa, Nepal",
   "about": "Backend-focused developer currently working independently on local freelance projects, building real-world software solutions. I specialize in APIs, database design, and system architecture, and I’m currently developing a School Management System. I enjoy understanding how things work under the hood and applying that knowledge to build reliable and scalable applications.",
