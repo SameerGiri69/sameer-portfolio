@@ -18,9 +18,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/myportfolio
-            ls -la
+            ls -a
             cd ~/sameer-portfolio
-            ls -la
+            ls -a
 
             echo "Pulling latest code..."
             git pull origin main
