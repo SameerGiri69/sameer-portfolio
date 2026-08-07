@@ -17,33 +17,24 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            script: |
-              echo "WHO AM I?"
-              whoami
+            cd ~/myportfolio
+            ls -la
+            cd ~/sameer-portfolio
+            ls -la
 
-              echo "WHERE AM I?"
-              pwd
+            echo "Pulling latest code..."
+            git pull origin main
 
-              echo "HOME:"
-              echo "$HOME"
+            echo "Stopping old container..."
+            sudo docker rm -f portfolio || true
 
-              echo "CONTENTS OF HOME:"
-              ls -la ~
+            echo "Building new image..."
+            sudo docker build -t portfolio .
 
-              echo "GOING TO REPO..."
-              cd /home/ec2-user/sameer-portfolio
+            echo "Starting new container..."
+            sudo docker run -d \
+              --name portfolio \
+              -p 80:80 \
+              portfolio
 
-              echo "CURRENT DIRECTORY:"
-              pwd
-
-              echo "GIT STATUS:"
-              git status
-
-              echo "GIT REMOTE:"
-              git remote -v
-
-              echo "PULLING..."
-              git pull origin main
-
-              echo "LATEST COMMIT:"
-              git log -1 --oneline
+            echo "Deployment complete!"
