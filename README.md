@@ -1,57 +1,45 @@
-# Portfolio Website — AWS + Docker + CI/CD
+# Portfolio Website — React + Docker + AWS CI/CD
 
-Production-style React portfolio deployed on AWS with automated CI/CD.
+Live site: [https://sameergiri.com.np](https://sameergiri.com.np)
 
----
+Production-style personal portfolio with fully automated CI/CD pipeline.
 
 ## Architecture
 
-```text
-GitHub (push to main)
-        │
-        ▼
-GitHub Actions
-   ├── Build Docker image
-   └── Push to Docker Hub
-        │
-        ▼
-EC2 (SSH)
-   ├── docker pull
-   ├── stop old container
-   └── run new container (:80)
-        │
-        ▼
-Application Load Balancer (HTTPS)
-        │
-        ▼
-CloudFront
-```
-Stack
+[Paste your nice architecture diagram here as an image]
 
-Frontend: React
-Container: Docker → Docker Hub
-Compute: EC2
-Load Balancer: ALB (HTTPS via ACM)
-CDN: CloudFront
-DNS: Route 53 (sameergiri.com.np)
-CI/CD: GitHub Actions
+**Request path:**  
+User → Route 53 → CloudFront → ALB (HTTPS + ACM) → EC2 (Docker container on port 80)
 
+## Tech Stack
+- Frontend: React (Vite)
+- Container: Docker (multi-stage recommended)
+- Registry: Docker Hub
+- Compute: EC2
+- Load Balancing: Application Load Balancer
+- CDN: CloudFront
+- DNS + HTTPS: Route 53 + ACM
+- CI/CD: GitHub Actions
 
-Highlights
+## Key Features / Highlights
+- Image is built in CI (not on the server)
+- Fully automated deploy on every push to `main`
+- Credentials stored securely in GitHub Secrets
+- Custom domain with free HTTPS
+- CloudFront in front of ALB for caching & lower latency
+- Zero-downtime-ish deployment (stop old → start new)
 
-Image built in CI, not on the server
-Fully automated deploy on every push to main
-Credentials stored in GitHub Secrets
-Custom domain + HTTPS (Route 53 + ACM + ALB)
-CloudFront CDN in front of the ALB
+## Design Decisions
+- Why CloudFront in front of ALB?
+- Why Docker Hub instead of ECR?
+- Why single EC2 instead of ECS Fargate / Auto Scaling?
+- Security choices (SSH key, secrets handling, etc.)
+- Cost considerations
 
+## How to Deploy / Run Locally
+(Add clear steps)
 
-Deployment Flow
-
-Push to main
-GitHub Actions builds & pushes image to Docker Hub
-SSHs into EC2 → pulls image → replaces container
-Traffic flows: Domain → Route 53 → CloudFront → ALB (HTTPS) → EC2
-        │
-        ▼
-Route 53 → sameergiri.com.np
+## Screenshots
+- Live site
+- GitHub Actions successful run
+- CloudFront / ALB console (if possible)
