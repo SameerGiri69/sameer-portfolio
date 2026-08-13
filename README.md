@@ -1,12 +1,12 @@
 # Portfolio Website — React + Docker + AWS CI/CD
 
-Live site: [https://sameergiri.com.np](https://sameergiri.com.np)
+Domain (may not be active): [https://sameergiri.com.np](https://sameergiri.com.np)
 
 Production-style personal portfolio with fully automated CI/CD pipeline.
 
 ## Architecture
 
-[Paste your nice architecture diagram here as an image]
+<img width="2400" height="2694" alt="image" src="https://github.com/user-attachments/assets/c7e43ad9-7639-441b-b9b2-3a68f51b9e28" />
 
 **Request path:**  
 User → Route 53 → CloudFront → ALB (HTTPS + ACM) → EC2 (Docker container on port 80)
@@ -37,9 +37,22 @@ User → Route 53 → CloudFront → ALB (HTTPS + ACM) → EC2 (Docker container
 - Cost considerations
 
 ## How to Deploy / Run Locally
-(Add clear steps)
+# 1. Clone the repo
+git clone https://github.com/<your-username>/<repo-name>.git
+cd <repo-name>
+
+# 2. Build the image from the Dockerfile
+docker build -t portfolio .
+
+# 3. Run the container
+docker run -d --name portfolio -p 80:80 portfolio
+
+# 4. Check it's running
+docker ps
 
 ## Screenshots
-- Live site
-- GitHub Actions successful run
+<img width="1920" height="921" alt="image" src="https://github.com/user-attachments/assets/3735cc51-572b-4dba-8056-89f71ba70a97" />
+
+<img width="1456" height="458" alt="image" src="https://github.com/user-attachments/assets/dc080c04-91c7-4821-80af-5a33b9fbacd5" />
+
 - CloudFront / ALB console (if possible)
