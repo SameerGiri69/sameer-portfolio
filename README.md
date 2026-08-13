@@ -1,150 +1,79 @@
-# Portfolio Website — AWS + Docker + CI/CD
+# Portfolio Website — React + Docker + AWS CI/CD
 
-A production-style React portfolio deployed on AWS with a fully automated CI/CD pipeline.
+Domain: [https://sameergiri.com.np](https://sameergiri.com.np)
 
-This project demonstrates a complete real-world deployment flow: containerization, image registry, automated builds, and zero-downtime-style deployments to EC2 behind an Application Load Balancer.
-
----
+Production-style personal portfolio with fully automated CI/CD pipeline.
+This is an early production-style deployment. See “Current Limitations” for what’s still missing and planned improvements.
 
 ## Architecture
 
-```text
-GitHub (push to main)
-        │
-        ▼
-GitHub Actions
-   ├── Build Docker image
-   └── Push to Docker Hub (awsportfolio)
-        │
-        ▼
-EC2 Instance (via SSH)
-   ├── docker pull
-   ├── stop old container
-   └── run new container (:80)
-        │
-        ▼
-Application Load Balancer
-        │
-        ▼
-Public traffic
-```
+<img width="2400" height="2694" alt="image" src="https://github.com/user-attachments/assets/c7e43ad9-7639-441b-b9b2-3a68f51b9e28" />
 
-### Key Components
+**Request path:**  
+User → Route 53 → CloudFront → ALB (HTTPS + ACM) → EC2 (Docker container on port 80)
 
-- Frontend: React — Portfolio application
-- Containerization: Docker — Consistent runtime environment
-- Image Registry: Docker Hub (awsportfolio) — Store versioned images
-- Compute: AWS EC2 — Runs the container
-- Load Balancing: AWS Application Load Balancer — Public entry point + routing
-- CI/CD: GitHub Actions — Automated build + deploy on every push
-- Secrets: GitHub Secrets — Secure credential management
+## Tech Stack
+- Frontend: React (Vite)
+- Container: Docker (multi-stage recommended)
+- Registry: Docker Hub
+- Compute: EC2
+- Load Balancing: Application Load Balancer
+- CDN: CloudFront
+- DNS + HTTPS: Route 53 + ACM
+- CI/CD: GitHub Actions
 
----
+## Key Features / Highlights
+- Image is built in CI (not on the server)
+- Fully automated deploy on every push to `main`
+- Credentials stored securely in GitHub Secrets
+- Custom domain with free HTTPS
+- CloudFront in front of ALB for caching & lower latency
+- Zero-downtime-ish deployment (stop old → start new)
 
-## What Makes This Setup Strong
+## Design Decisions
+- Why CloudFront in front of ALB?
+- Why Docker Hub instead of ECR?
+- Why single EC2 instead of ECS Fargate / Auto Scaling?
+- Security choices (SSH key, secrets handling, etc.)
+- Cost considerations
 
-- **Build happens in CI, not on production**
-  The Docker image is built inside GitHub Actions and pushed to Docker Hub. The EC2 instance only pulls and runs the image. This is a significant improvement over building directly on the server.
-- **Fully automated pipeline**
-  Every push to main triggers:
-  1. Image build
-  2. Push to registry
-  3. Remote deployment via SSH
-  4. Container replacement
-- **Clean separation of concerns**
-  - CI handles building & publishing
-  - Production only runs containers
-  - Load balancer sits in front of the instance
-- **Secure credential handling**
-  All sensitive values (Docker Hub token, SSH key, EC2 host) live in GitHub Secrets — nothing is hardcoded.
-- **Infrastructure already in place for growth**
-  The ALB + EC2 foundation makes it straightforward to add HTTPS, custom domains, auto-scaling, caching, and more.
+## How to Deploy / Run Locally
+# 1. Clone the repo
+git clone https://github.com/<your-username>/<repo-name>.git
+cd <repo-name>
 
----
+# 2. Build the image from the Dockerfile
+docker build -t portfolio .
 
-## Deployment Flow (Current)
+# 3. Run the container
+docker run -d --name portfolio -p 80:80 portfolio
 
-1. Developer pushes code to main
-2. GitHub Actions checks out the code
-3. Logs into Docker Hub
-4. Builds the image and tags it with both latest and the commit SHA
-5. Pushes the image to username/awsportfolio
-6. SSHs into the EC2 instance
-7. Authenticates with Docker Hub
-8. Pulls the new image
-9. Stops and removes the old container
-10. Starts a new container mapped to port 80
-11. Traffic continues flowing through the Application Load Balancer
+# 4. Check it's running
+docker ps
 
----
+## Screenshots
 
-## Local Development
+# Live site
+<img width="1920" height="921" alt="image" src="https://github.com/user-attachments/assets/3735cc51-572b-4dba-8056-89f71ba70a97" />
 
-```bash
-git clone <repo-url>
-cd <repo>
-npm install
-npm start
-```
 
----
+# Github Actions
+<img width="1456" height="458" alt="image" src="https://github.com/user-attachments/assets/dc080c04-91c7-4821-80af-5a33b9fbacd5" />
 
-## Manual Deployment (if needed)
+## Current Limitations
 
-```bash
-# On the EC2 instance
-docker pull <your-dockerhub-username>/awsportfolio:latest
-docker rm -f portfolio || true
-docker run -d --name portfolio -p 80:80 <your-dockerhub-username>/awsportfolio:latest
-```
+- Single EC2 instance → single point of failure (no Multi-AZ or Auto Scaling yet)
+- Deployed via SSH + `docker run` instead of a more robust method (ECS, CodeDeploy, or blue/green)
+- Using Docker Hub instead of Amazon ECR
+- Infrastructure is still managed manually (not yet Infrastructure as Code)
+- No CloudWatch alarms, logging aggregation, or monitoring dashboards yet
+- No zero-downtime deployment strategy
 
----
+## Next Steps / Future Improvements
 
-## Future Improvements / Roadmap
-
-This project is intentionally built as a foundation. Planned upgrades include:
-
-### Networking & DNS
-
-- Custom domain via **Amazon Route 53**
-- HTTPS using **AWS Certificate Manager (ACM)** + ALB HTTPS listener
-- Redirect HTTP → HTTPS
-
-### Performance & Caching
-
-- **Amazon ElastiCache** (Redis) for session or API response caching
-- CloudFront CDN in front of the ALB for static assets and global edge caching
-
-### Scalability & Reliability
-
-- Move from single EC2 to **ECS + Fargate** (or ECS on EC2)
-- Auto Scaling Group + multiple targets behind the ALB
-- Health checks and rolling deployments
-- Blue/Green or canary deployments
-
-### Observability & Operations
-
-- CloudWatch Logs + metrics + alarms
-- Centralized logging
-- Infrastructure as Code (Terraform or AWS CDK)
-
-### Security
-
-- IAM Roles for EC2 (remove long-lived Docker Hub credentials where possible)
-- Private subnets + tighter security groups
-- Secrets Manager / Parameter Store instead of plain secrets where appropriate
-
----
-
-## Why This Project Matters
-
-Most portfolio sites are just static files on Vercel or Netlify.
-
-This one deliberately goes deeper:
-
-- Real AWS networking (ALB + EC2)
-- Real container workflow (build in CI → registry → pull on server)
-- Real CI/CD automation
-- Clear path to production-grade services (Route 53, ElastiCache, ECS, CloudFront, etc.)
-
-It shows both current capability and the willingness to keep evolving the architecture.
+- Migrate infrastructure to **Terraform**
+- Move from EC2 to **ECS Fargate** (or Auto Scaling Group)
+- Switch container registry to **Amazon ECR**
+- Add proper monitoring (CloudWatch alarms + dashboard)
+- Implement blue/green or rolling deployments
+- Add HTTPS redirect and security headers
