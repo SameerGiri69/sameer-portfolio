@@ -2,8 +2,6 @@
 
 Production-style React portfolio deployed on AWS with automated CI/CD.
 
-**Live:** [https://sameergiri.com.np](https://sameergiri.com.np)
-
 ---
 
 ## Architecture
@@ -27,9 +25,7 @@ Application Load Balancer (HTTPS)
         │
         ▼
 CloudFront
-        │
-        ▼
-Route 53 → sameergiri.com.np
+```
 Stack
 
 Frontend: React
@@ -56,3 +52,6 @@ Push to main
 GitHub Actions builds & pushes image to Docker Hub
 SSHs into EC2 → pulls image → replaces container
 Traffic flows: Domain → Route 53 → CloudFront → ALB (HTTPS) → EC2
+        │
+        ▼
+Route 53 → sameergiri.com.np
