@@ -37,20 +37,6 @@ User → Route 53 → CloudFront → ALB (HTTPS + ACM) → EC2 (Docker container
 - Security choices (SSH key, secrets handling, etc.)
 - Cost considerations
 
-## How to Deploy / Run Locally
-# 1. Clone the repo
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
-
-# 2. Build the image from the Dockerfile
-docker build -t portfolio .
-
-# 3. Run the container
-docker run -d --name portfolio -p 80:80 portfolio
-
-# 4. Check it's running
-docker ps
-
 ## Screenshots
 
 # Live site
