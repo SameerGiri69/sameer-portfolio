@@ -26,7 +26,7 @@ User → Route 53 → CloudFront → ALB (HTTPS + ACM) → EC2 (Docker container
 - Image is built in CI (not on the server)
 - Fully automated deploy on every push to `main`
 - Credentials stored securely in GitHub Secrets
-- Custom domain with free HTTPS
+- Custom domain with ent-to-end HTTPS
 - CloudFront in front of ALB for caching & lower latency
 - Zero-downtime-ish deployment (stop old → start new)
 
@@ -62,4 +62,3 @@ User → Route 53 → CloudFront → ALB (HTTPS + ACM) → EC2 (Docker container
 - Switch container registry to **Amazon ECR**
 - Add proper monitoring (CloudWatch alarms + dashboard)
 - Implement blue/green or rolling deployments
-- Add HTTPS redirect and security headers
